@@ -1,7 +1,7 @@
 -- RETAIL SALES ANALYSIS USING SQL
 -- CREATE DATABASE Retail_sales_analysis_sqlProject1
--- step1: data loading and cleaning
-DROP TABLE IF EXISTS REtail_sales;
+-- step1: data cleaning
+DROP TABLE IF EXISTS Retail_sales;
 CREATE TABLE Retail_sales
 			(
 				transactions_id INT PRIMARY KEY,
@@ -21,14 +21,14 @@ SELECT * FROM Retail_Sales
 LIMIT 10
 
 SELECT COUNT(*) FROM Retail_sales
---finding if there is any null value
+--checking null values one by one 
 SELECT * FROM Retail_Sales
 WHERE transactions_id IS NULL
 
 SELECT * FROM Retail_Sales
 WHERE sale_date IS NULL	
 
--- we can check for all the columns altogether
+-- we can check for all columns in single query 
 SELECT * FROM Retail_sales
 WHERE 
 	transactions_id IS NULL
@@ -77,15 +77,13 @@ WHERE
 	cogs is NULL
 	OR
 	total_sale IS NULL
---checking the count of left items which are not null
-SELECT COUNT(*) from Retail_sales
-
+	
 -- step2: DATA EXPLORATION
 -- how many customers we have ? ( use distict function)
-SELECT COUNT(DISTINCT customer_id) FROM Retail_sales --155 
+SELECT COUNT(DISTINCT customer_id) FROM Retail_sales 
 
 -- how many categories we have ?
-SELECT COUNT(DISTINCT category) FROM Retail_sales --3
+SELECT COUNT(DISTINCT category) FROM Retail_sales 
 SELECT DISTINCT category FROM Retail_sales -- gives the name of categories
 
 -- DATA ANALYSIS ( BUSINESS PROBLEMS )
@@ -106,7 +104,8 @@ AND quantiy>=3
 SELECT category,SUM(total_sale) as net_sale,COUNT(*) as no_of_orders
 FROM Retail_sales
 GROUP BY category
--- q4. write sql query to find the avearge age of customers who purchased items from the 'Beauty' category?
+	
+-- q4. write sql query to find the average age of customers who purchased items from the 'Beauty' category?
 SELECT  
 	ROUND(AVG(age),2)
 FROM Retail_sales	
@@ -117,40 +116,16 @@ SELECT *
 FROM Retail_sales
 WHERE total_sale>1000
 
--- q6write sql query to find total number of transactions (transaction_id) made by each gender in each category?
+-- q6.write sql query to find total number of transactions (transaction_id) made by each gender in each category?
 SELECT 
 	category,
 	gender,
 	COUNT(*) as total_trans
 FROM Retail_sales
 GROUP BY category,gender
-ORDER BY 
--- q7. write sql query to calculate average sale for each month.find out the best selling month in each year
+ORDER BY category,gender 
 
-SELECT TO_CHAR(sale_date,'MM-YYYY'),AVG(total_sale)as AVG_SALE--,MAX()
-FROM Retail_sales
-GROUP BY 1
-ORDER BY 2
-
--- or
-SELECT 
-	year,
-	month,
-	avg_sale
-FROM
-(
-SELECT 
-	EXTRACT (YEAR FROM sale_date) as year,
-	EXTRACT (MONTH FROM sale_date )as month,
-	AVG(total_sale) as avg_sale
-	RANK() OVER(PARTITION BY EXTRACT (YEAR FROM sale_date))ORDER BY AVG(total_sale)DESC) as rank
-FROM Retail_sales
-GROUP BY year,month
-)as t1
-WHERE rank=1
--- ORDER BY year,avg_sale
-
--- q8. write sql query to find the top 5 customers based on highest total sales
+-- q7. write sql query to find the top 5 customers based on highest total sales
 
 SELECT 
 	customer_id,
@@ -159,14 +134,14 @@ FROM Retail_sales
 GROUP BY 1
 ORDER BY 2 DESC
 LIMIT 5
--- q9.write sql query to find number of unique customers who purchased items from each category?
+-- q8.write sql query to find number of unique customers who purchased items from each category?
 SELECT 
 	category,
 	COUNT(DISTINCT customer_id)as UNI_cust
 FROM Retail_sales
 GROUP BY category
 
--- q10. write a sql query to create each shift and number of orders(eg.morning<=12,Afternoon btw 12&17,Eveing >17)
+-- q9. write a sql query to create each shift and number of orders(eg.morning<=12,Afternoon btw 12&17,Eveing >17)
 WITH hourly_sales
 AS
 (
